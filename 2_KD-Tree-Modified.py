@@ -1,6 +1,7 @@
 import numpy as np
 import heapq
 from sklearn import datasets
+import matplotlib.pyplot as plt
 
 # Definición de la clase Node
 class Node:
@@ -59,6 +60,29 @@ class KDTree:
 
         k_closest_points = [point for (_, point) in sorted(closest)]
         return k_closest_points
+    
+    def plot_kd_tree(self, axis_bounds=None):
+        def plot_node(node, depth=0):
+            if node is not None:
+                k = len(node.point)
+                axis = depth % k
+
+                # Recorrido inorden para dibujar primero los nodos izquierdos
+                plot_node(node.left, depth + 1)
+
+                # Dibujar el punto
+                plt.plot(node.point[0], node.point[1], 'bo')
+
+                plot_node(node.right, depth + 1)
+
+        plt.figure(figsize=(10, 6))
+        plt.title("KD-Tree")
+
+        plot_node(self.root)
+        if axis_bounds:
+            plt.xlim(*axis_bounds[0])
+            plt.ylim(*axis_bounds[1])
+        plt.gca().set_aspect('equal', adjustable='box')
 
 # Cargar el conjunto de datos de vinos
 wine_dataset = datasets.load_wine()
@@ -78,3 +102,40 @@ k_neighbors = kdtree.closest_points(target_point, k=5)
 print("Los 5 vecinos más cercanos al punto de destino son:")
 for neighbor in k_neighbors:
     print(neighbor)
+
+# Graficar el KD-Tree
+kdtree.plot_kd_tree()
+plt.plot(target_point[0], target_point[1], 'go', label='Target Point')
+circle = plt.Circle([target_point[0], target_point[1]], 0.5, color='b', fill=False)
+plt.gca().add_artist(circle)
+plt.legend()
+plt.show()
+
+
+# # Cargar el conjunto de datos de iris
+# iris_dataset = datasets.load_iris()
+# iris_data = iris_dataset.data
+
+# # Convertir los datos en una lista de puntos
+# iris_points = [list(point) for point in iris_data]
+
+# # Construir el árbol KD con los datos de iris
+# kdtree = KDTree(iris_points)
+
+# # Punto de destino para encontrar vecinos cercanos (por ejemplo, el primer punto del conjunto de datos)
+# target_point = iris_points[50]
+# print(target_point)
+
+# # Encuentra los 5 vecinos más cercanos al punto de destino
+# k_neighbors = kdtree.closest_points(target_point, k=5)
+# print("Los 5 vecinos más cercanos al punto de destino son:")
+# for neighbor in k_neighbors:
+#     print(neighbor)
+
+# # Graficar el KD-Tree
+# kdtree.plot_kd_tree()
+# plt.plot(target_point[0], target_point[1], 'go', label='Target Point')
+# circle = plt.Circle([target_point[0], target_point[1]], 0.5, color='b', fill=False)
+# plt.gca().add_artist(circle)
+# plt.legend()
+# plt.show()
